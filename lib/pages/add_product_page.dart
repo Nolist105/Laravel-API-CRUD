@@ -82,11 +82,11 @@ class _AddProductPageState extends State<AddProductPage> {
         decoration: const InputDecoration(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
-            borderSide: BorderSide(color: Colors.blue, width: 2),
+            borderSide: BorderSide(color: Colors.orange, width: 2),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
-            borderSide: BorderSide(color: Colors.blue, width: 2),
+            borderSide: BorderSide(color: Colors.orange, width: 2),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
@@ -94,11 +94,11 @@ class _AddProductPageState extends State<AddProductPage> {
           ),
           prefixIcon: Icon(
             Icons.sell,
-            color: Colors.blue,
+            color: Colors.orange,
           ),
           label: Text(
             'Price',
-            style: TextStyle(color: Colors.blue),
+            style: TextStyle(color: Colors.orange),
           ),
         ),
       ),
@@ -120,11 +120,11 @@ class _AddProductPageState extends State<AddProductPage> {
         decoration: const InputDecoration(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
-            borderSide: BorderSide(color: Colors.blue, width: 2),
+            borderSide: BorderSide(color: Colors.orange, width: 2),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
-            borderSide: BorderSide(color: Colors.blue, width: 2),
+            borderSide: BorderSide(color: Colors.orange, width: 2),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
@@ -132,11 +132,11 @@ class _AddProductPageState extends State<AddProductPage> {
           ),
           prefixIcon: Icon(
             Icons.emoji_objects,
-            color: Colors.blue,
+            color: Colors.orange,
           ),
           label: Text(
             'Product Name',
-            style: TextStyle(color: Colors.blue),
+            style: TextStyle(color: Colors.orange),
           ),
         ),
       ),
@@ -180,16 +180,25 @@ class _AddProductPageState extends State<AddProductPage> {
   }
 
   Future<void> addProduct() async {
-    // Call SharedPreference to get Token
+    SharedPreferences prefs = await _prefs;
+    if (_addFormKey.currentState!.validate()) {
+      var data = jsonEncode({
+        "product_name": _name.text,
+        "price": _price.text,
+        "product_type": _selectedType.value,
+      });
 
-    // Check Valid Form
+      var url =
+          Uri.parse('https://laravel-sahatsawat105.herokuapp.com/api/products');
 
-    // Covert Values to Json
+      var response = await http.post(url, body: data, headers: {
+        HttpHeaders.contentTypeHeader: 'application/json',
+        HttpHeaders.authorizationHeader: 'Bearer ${prefs.getString('token')}'
+      });
 
-    // Define Laravel API for Adding Product
-
-    // Request for adding product
-
-    // Check Status Code, then pop to the previous
+      if (response.statusCode == 200) {
+        Navigator.pop(context);
+      }
+    }
   }
 }

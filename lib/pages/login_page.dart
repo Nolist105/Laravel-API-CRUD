@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:productapp/pages/show_product_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
@@ -56,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
       height: height,
       child: TextButton(
         style: ButtonStyle(
-          foregroundColor: MaterialStateProperty.all<Color>(Colors.lightBlue),
+          foregroundColor: MaterialStateProperty.all<Color>(Colors.orange),
         ),
         onPressed: () {},
         child: const Text('สมัครสมาชิก'),
@@ -79,9 +80,13 @@ class _LoginPageState extends State<LoginPage> {
           onPressed: () async {
             if (_formKey.currentState!.validate()) {
               // check valid email and password by using laravel api
+              var json = jsonEncode({
+                "email": _email.text,
+                "password": _password.text,
+              });
 
               // Define your http laravel API location
-              var url = Uri.parse('.....');
+              var url = Uri.parse('https://laravel-sahatsawat105.herokuapp.com/api/login');
 
               // Request by POST Method
               var response = await http.post(
@@ -92,8 +97,22 @@ class _LoginPageState extends State<LoginPage> {
 
               if (response.statusCode == 200) {
                 // Store user and token to local storage by using SharedPreference
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                var userJson = jsonDecode(response.body)['user'];
+                var tokenJson = jsonDecode(response.body)['token'];
+                await prefs.setStringList('user', [
+                  userJson['name'],
+                  userJson['email'],
+                  userJson['role'].toString(),
+                ]);
+                await prefs.setString('token', tokenJson);
 
                 // Navigate to ShowProduct Page
+                 Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (contaxt) => const ShowProductPage(),
+                    ));
 
               }
               // if no, show alert -- error text
@@ -119,11 +138,11 @@ class _LoginPageState extends State<LoginPage> {
         decoration: const InputDecoration(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
-            borderSide: BorderSide(color: Colors.blue, width: 2),
+            borderSide: BorderSide(color: Colors.orange, width: 2),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
-            borderSide: BorderSide(color: Colors.blue, width: 2),
+            borderSide: BorderSide(color: Colors.orange, width: 2),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
@@ -131,11 +150,11 @@ class _LoginPageState extends State<LoginPage> {
           ),
           prefixIcon: Icon(
             Icons.email,
-            color: Colors.blue,
+            color: Colors.orange,
           ),
           label: Text(
             'E-mail',
-            style: TextStyle(color: Colors.blue),
+            style: TextStyle(color: Colors.orange),
           ),
         ),
       ),
@@ -158,11 +177,11 @@ class _LoginPageState extends State<LoginPage> {
         decoration: const InputDecoration(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
-            borderSide: BorderSide(color: Colors.blue, width: 2),
+            borderSide: BorderSide(color: Colors.orange, width: 2),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
-            borderSide: BorderSide(color: Colors.blue, width: 2),
+            borderSide: BorderSide(color: Colors.orange, width: 2),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
@@ -170,11 +189,11 @@ class _LoginPageState extends State<LoginPage> {
           ),
           prefixIcon: Icon(
             Icons.lock,
-            color: Colors.blue,
+            color: Colors.orange,
           ),
           label: Text(
             'Password',
-            style: TextStyle(color: Colors.blue),
+            style: TextStyle(color: Colors.orange),
           ),
         ),
       ),
